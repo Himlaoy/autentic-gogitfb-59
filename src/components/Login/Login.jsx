@@ -4,7 +4,7 @@ import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup } from
 
 
 
-const OldLogin = () => {
+const Login = () => {
 
 
     const auth = getAuth(app)
