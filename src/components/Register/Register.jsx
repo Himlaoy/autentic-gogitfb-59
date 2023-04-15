@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth';
 import app from '../../firebase.config';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
     const [success, setSuccess] = useState()
@@ -14,21 +15,54 @@ const Register = () => {
         event.preventDefault()
         const email = event.target.email.value
         const password = event.target.password.value
-        console.log(event.target.email.value)
+        console.log(email, password)
+
+        if(!/(?=.*[A-Z])/.test(password)){
+            setError('please put at least one uppercase latter')
+        }
+        else if (!/(?=.*[!@#$%^&*])/.test(password)) {
+            setError('please put at least one special character')
+            return
+        }
+        else if (password.length < 6) {
+            setError('please put at least 6 character')
+            return
+        }
+
+
 
         createUserWithEmailAndPassword(auth, email, password)
             .then(result => {
                 const loggedUser = result.user
                 setSuccess('log in successfully')
+                sendVerify(loggedUser)
+                event.target.reset()
                 setError('')
-                console.log(loggedUser)
+                console.log(result.user)
             })
             .catch(error => {
                 console.error(error)
                 setSuccess('')
                 setError(error.message)
             })
+
+
+        const sendVerify = (user,) => {
+            sendEmailVerification(user)
+                .then(result => {
+                    alert('check yor email')
+                    console.log(result)
+                })
+                .catch(error => {
+                    console.log(error.message)
+                    setError(error.message)
+                })
+        }
+
+
     }
+
+
 
     return (
         <div >
@@ -44,6 +78,7 @@ const Register = () => {
                     </form>
                     <p className='text-danger'>{error}</p>
                     <p className='text-success'>{success}</p>
+                    <p>Already have an account? please <Link to="/login">Login</Link></p>
                 </div>
             </div>
         </div>
